@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,22 +7,30 @@
     <title>Topics Tasks </title>
 </head>
 <body>
+
+    <h1> {{ topic.title }} </h1>
     <ul>
          <!-- tasks will be fetched from db -->
-        <li>Task1</li>
-        <li>Task2</li>
-        <li>Task3</li>
+       {% for task in tasks %}
+       <li> {{ task.description }}</li>
+       {% endfor %}
     </ul>
 
     <h3>Add new task </h3>
     <!-- form responsible for creating new tasks -->
     <!-- topic id relates to topic id in render function -->
-    <form action="/add/task/ {{ topic_id }}" method="POST">
+    <form action="/add/task/ {{ topic.topic_id }}" method="POST">
         <div>
             <label for="task">Task</label>
             <input type="text" name="task-description">
         </div>
         <input type="submit" value="Add Task"/>
     </form>
+
+    <div class="message">
+        {% for category, message in get_flashed_messages(with_categories=true)%}
+        <div style="color: {{ category }};"> {{ message }}</div>
+        {% endfor %}
+    </div>
 </body>
 </html>

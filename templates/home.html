@@ -12,7 +12,7 @@
     <ul>
        <!-- displaying dinamic data from db -->
        {% for topic in topics %}
-       <li><a href="/topic/{{ topics.topic_id }}">{{ topic.title }}</a></li>
+       <li><a href="/topic/{{ topic.topic_id }}">{{ topic.title }}</a></li>
        {% endfor %}
 
     </ul>
@@ -20,12 +20,17 @@
     <h3>Add a new topic</h3>
     <form action="/add/topic" method="POST">
         <div>
-            <label for="topic_name">Topic name</label>
             <input type="text" name="topic-title">
 
         </div>
         <!-- by clicking user submits everything 2 the server -->
         <input type="submit" value="Add Topic"/>
+
+        <div class="message">
+            {% for category ,message in  get_flashed_messages(with_categories=true) %}
+            <div style="color: {{ category }};"> {{ message }}</div>
+            {% endfor %}
+        </div>
     </form>
 </body>
 </html>

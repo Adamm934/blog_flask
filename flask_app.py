@@ -1,6 +1,7 @@
 
 from logging import debug
-from flask import Flask, render_template
+from turtle import title
+from flask import Flask, render_template, request, flash , redirect , url_for
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -14,12 +15,25 @@ app.config['SECRET_KEY'] = '\xff\x98Tq\x80\xf3\xb6\xac=\x10\xbfG\x9a\x98\x1e\xab
 db = SQLAlchemy(app)
 
 
+# imolementation of dynamic tasks first step to create class
+
+     
+
 class Topic(db.Model):
     __tablename__ = 'topics'
 
     topic_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(length=255))
 
+
+class Task(db.Model):
+     __tablename__ = 'tasks'
+     
+     task_id = db.Column(db.Integer, primary_key=True)
+     topic_id = db.Column(db.Integer, db.ForeignKey('topics.topic_id'))
+     description = db.Column(db.String(length=255))
+     
+     topic = db.relationship('Topic')
 
 @app.route('/')
 def display_topics():
@@ -28,21 +42,38 @@ def display_topics():
 
 @app.route('/topic/<topic_id>')
 def display_tasks(topic_id):
-    return render_template("topic-tasks.html", topic_id=topic_id)
+    return render_template("topic-tasks.html", topic=Topic.query.filter_by(topic_id=topic_id).first(),
+                           tasks= Task.query.filter_by(topic_id=topic_id))
 
 
 @app.route('/add/topic', methods=["POST"])
 def add_topic():
     # add topic functionality
-
-    return "Topic Added Successfully"
+    if not request.form["topic-title"]:
+        flash('Enter title for your new topic', 'orange')
+    else:
+        # storing topick user entered
+        topic = Topic(title=request.form['topic-title'])
+        # adding to db
+        db.session.add(topic)
+        db.session.commit()
+        flash('Topic Added succesfully', 'tomato')
+        
+    return redirect(url_for('display_topics'))
 
 
 @app.route("/add/task/<topic_id>", methods=["POST"])
 def add_task(topic_id):
     # add task functionality
-
-    return "Task Added Successfully"
+    if not request.form['task-description']:
+        flash('Enter a description for new task', 'yellow')
+    else:
+        task = Task(description=request.form["task-description"], topic_id = topic_id)
+        db.session.add(task)
+        db.session.commit()
+        flash('Task Added succesfully', 'lawngreen')
+        
+    return redirect(url_for('display_tasks', topic_id=topic_id))
 
 
 
